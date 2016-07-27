@@ -36,7 +36,7 @@ public class IOTest
     private static CharArrayWriter charsOut;
 
     @BeforeClass
-    public static void copy_InputStream_to_OutputStream() throws IOException
+    public static void beforeClass() throws IOException
     {
         Files.deleteIfExists(Paths.get(testOutputResource));
         Files.deleteIfExists(Paths.get(testOutputResource).getParent());
@@ -90,10 +90,14 @@ public class IOTest
     {
         Files.deleteIfExists(Paths.get(testOutputResource));
         Files.deleteIfExists(Paths.get(testOutputResource).getParent());
+        bytesIn.reset();
+        bytesOut.reset();
+        charsIn.reset();
+        charsOut.reset();
     }
 
     @AfterClass
-    public static void cleanup()
+    public static void afterClass()
     {
         try { bytesIn.close(); } catch (IOException ex) { LOG.log(WARNING, ex.getMessage(), ex); }
         try { bytesOut.close(); } catch (IOException ex) { LOG.log(WARNING, ex.getMessage(), ex); }
@@ -109,6 +113,13 @@ public class IOTest
         assertThat(IO.read(testInputResource), is(equalTo(BYTE_DATA)));
         assertThat(IO.read(testClasspathResource), is(equalTo(BYTE_DATA)));
         assertThat(IO.read(testClasspathResource.replace("classpath:", "classpath:/")), is(equalTo(BYTE_DATA)));
+    }
+
+    @Test
+    public void copy_InputStream_to_OutputStream() throws IOException
+    {
+        assertThat(IO.copy(bytesIn, bytesOut), is(equalTo((long) BYTE_DATA.length)));
+        bytesIn.reset();
     }
 
     @Test
